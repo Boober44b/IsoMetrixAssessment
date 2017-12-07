@@ -29,7 +29,6 @@ namespace IsoMetrix_Assessment.Controllers
         public ActionResult AddressLookup(FormData formData)
         {
             var address = formData.Address;
-            WebResponse response;
             Format formatOption;
             Enum.TryParse(formData.FormatOption, out formatOption);
 
@@ -37,20 +36,16 @@ namespace IsoMetrix_Assessment.Controllers
             {
                 // XML
                 case Format.Xml:
-
                     try
                     {
-                        response = CallGoogle("xml", address);
-
-                        var rawXml = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                        ViewBag.Format = "XML";
-                        ViewBag.RawOutput = rawXml;
-
+                        var rawXml = CallGoogle("xml", address);
                         var serializer = new XmlSerializer(typeof(GeocodeResponse));
                         var memStream = new MemoryStream(Encoding.UTF8.GetBytes(rawXml));
 
-                        var parsedXml = (GeocodeResponse) serializer.Deserialize(memStream);
+                        var parsedXml = (GeocodeResponse)serializer.Deserialize(memStream);
 
+                        ViewBag.Format = "XML";
+                        ViewBag.RawOutput = rawXml;
                         ViewBag.Status = parsedXml.Status;
 
                         if (parsedXml.Status == "OK")
@@ -73,17 +68,13 @@ namespace IsoMetrix_Assessment.Controllers
 
                 // JSON
                 case Format.Json:
-
                     try
                     {
-                        response = CallGoogle("json", address);
-
-                        var rawJson = new StreamReader(response.GetResponseStream()).ReadToEnd();
-                        ViewBag.Format = "JSON";
-                        ViewBag.RawOutput = rawJson;
-
+                        var rawJson = CallGoogle("json", address);
                         var parsedJson = JsonConvert.DeserializeObject<GeolocationJson>(rawJson);
 
+                        ViewBag.Format = "JSON";
+                        ViewBag.RawOutput = rawJson;
                         ViewBag.Status = parsedJson.status;
 
                         if (parsedJson.status == "OK")
@@ -115,14 +106,13 @@ namespace IsoMetrix_Assessment.Controllers
             return PartialView("~/Views/Partials/AddressLookup.cshtml");
         }
 
-        private WebResponse CallGoogle(string format, string address)
+        private string CallGoogle(string format, string address)
         {
-
             string requestUri = $"http://maps.googleapis.com/maps/api/geocode/{format}?address={Uri.EscapeDataString(address)}&sensor=false";
             var request = WebRequest.Create(requestUri);
             var response = request.GetResponse();
 
-            return response;
+            return new StreamReader(response.GetResponseStream()).ReadToEnd();
         }
     }
 
