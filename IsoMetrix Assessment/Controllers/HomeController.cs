@@ -13,8 +13,7 @@ namespace IsoMetrix_Assessment.Controllers
 {
     public class HomeController : Controller
     {
-
-        enum Format
+        private enum Format
         {
             Xml = 1,
             Json = 2
@@ -39,6 +38,7 @@ namespace IsoMetrix_Assessment.Controllers
                     try
                     {
                         var rawXml = CallGoogle("xml", address);
+
                         var serializer = new XmlSerializer(typeof(GeocodeResponse));
                         var memStream = new MemoryStream(Encoding.UTF8.GetBytes(rawXml));
 
@@ -106,13 +106,13 @@ namespace IsoMetrix_Assessment.Controllers
             return PartialView("~/Views/Partials/AddressLookup.cshtml");
         }
 
-        private string CallGoogle(string format, string address)
+        private static string CallGoogle(string format, string address)
         {
-            string requestUri = $"http://maps.googleapis.com/maps/api/geocode/{format}?address={Uri.EscapeDataString(address)}&sensor=false";
+            var requestUri = $"http://maps.googleapis.com/maps/api/geocode/{format}?address={Uri.EscapeDataString(address)}&sensor=false";
             var request = WebRequest.Create(requestUri);
             var response = request.GetResponse();
-
-            return new StreamReader(response.GetResponseStream()).ReadToEnd();
+            var responseStream = response.GetResponseStream();
+            return responseStream != null ? new StreamReader(responseStream).ReadToEnd() : string.Empty;
         }
     }
 
