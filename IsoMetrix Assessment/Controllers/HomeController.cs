@@ -50,12 +50,9 @@ namespace IsoMetrix_Assessment.Controllers
 
                         if (parsedXml.Status == "OK")
                         {
-                            ViewBag.Route = parsedXml.Result.Address_component
-                                .FirstOrDefault(x => x.Type.Contains("route"))?.Long_name;
-                            ViewBag.Country = parsedXml.Result.Address_component
-                                .FirstOrDefault(x => x.Type.Contains("country"))?.Long_name;
-                            ViewBag.Premise = parsedXml.Result.Address_component
-                                .FirstOrDefault(x => x.Type.Contains("premise"))?.Long_name;
+                            ViewBag.Route = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("route"))?.Long_name;
+                            ViewBag.Country = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("country"))?.Long_name;
+                            ViewBag.Premise = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("premise"))?.Long_name;
                             ViewBag.Longitude = parsedXml.Result.Geometry.Location.Lng;
                             ViewBag.Latitude = parsedXml.Result.Geometry.Location.Lat;
                         }
@@ -79,16 +76,11 @@ namespace IsoMetrix_Assessment.Controllers
 
                         if (parsedJson.status == "OK")
                         {
-                            ViewBag.Route = parsedJson.results.FirstOrDefault()?.address_components
-                                .FirstOrDefault(x => x.types.Contains("route"))?.long_name;
-                            ViewBag.Country = parsedJson.results.FirstOrDefault()?.address_components
-                                .FirstOrDefault(x => x.types.Contains("country"))?.long_name;
-                            ViewBag.Premise = parsedJson.results.FirstOrDefault()?.address_components
-                                .FirstOrDefault(x => x.types.Contains("premise"))?.long_name;
-                            ViewBag.Longitude = parsedJson.results.FirstOrDefault()?.geometry.location.lng
-                                .ToString(CultureInfo.InvariantCulture);
-                            ViewBag.Latitude = parsedJson.results.FirstOrDefault()?.geometry.location.lat
-                                .ToString(CultureInfo.InvariantCulture);
+                            ViewBag.Route = parsedJson.results.FirstOrDefault()?.address_components.FirstOrDefault(x => x.types.Contains("route"))?.long_name;
+                            ViewBag.Country = parsedJson.results.FirstOrDefault()?.address_components.FirstOrDefault(x => x.types.Contains("country"))?.long_name;
+                            ViewBag.Premise = parsedJson.results.FirstOrDefault()?.address_components.FirstOrDefault(x => x.types.Contains("premise"))?.long_name;
+                            ViewBag.Longitude = parsedJson.results.FirstOrDefault()?.geometry.location.lng.ToString(CultureInfo.InvariantCulture);
+                            ViewBag.Latitude = parsedJson.results.FirstOrDefault()?.geometry.location.lat.ToString(CultureInfo.InvariantCulture);
                         }
                     }
                     catch (Exception)
