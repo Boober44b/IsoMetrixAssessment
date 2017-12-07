@@ -1,0 +1,37 @@
+﻿@model IsoMetrix_Assessment.Models.FormData
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>API Status: @ViewBag.Status</h2>
+    </div>
+</div> <div class="row">
+    <div class="col-md-12">
+        <h2>Format: @ViewBag.Format</h2>
+        <p>@ViewBag.RawOutput</p>
+    </div>
+</div>    
+<div class="row">
+    <div class="col-md-12">
+        <h2>Grid View</h2>       
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Country</th>
+                <th>Premise</th>
+                <th>Route</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>@ViewBag.Country</td>
+                <td>@ViewBag.Premise</td>
+                <td>@ViewBag.Route</td>
+                <td>@ViewBag.Latitude</td>
+                <td>@ViewBag.Longitude</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

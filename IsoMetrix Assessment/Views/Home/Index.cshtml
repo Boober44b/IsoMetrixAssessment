@@ -1,0 +1,28 @@
+﻿@model IsoMetrix_Assessment.Models.FormData
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>Address Lookup</h1>
+    
+    @using (Ajax.BeginForm("AddressLookup", "Home", new AjaxOptions { HttpMethod = "POST", UpdateTargetId = "result", LoadingElementId = "loading" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <p>
+            @Html.DropDownListFor(m => m.FormatOption, new SelectList(""), "Please select", new { @class = "form-control",  required = "required"})
+        </p>
+        <p>
+            @Html.TextBoxFor(m => m.Address, new { @class = "form-control", required = "required", placeholder="Address" })
+        </p>
+        <p>
+            <input type="submit" class="btn btn-primary btn-lg" value="Submit"/>
+        </p>
+        <div id="loading" style="display: none;">
+            <img src="~/Content/images/spinner.gif" width="50" height="50"/>
+        </div>
+    }
+</div>
+
+<div id="result"></div>
