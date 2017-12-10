@@ -71,9 +71,9 @@ namespace IsoMetrix_Assessment.Controllers
                             viewModel.LocationData.Add(locationData);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        viewModel.Status = "Error";
+                        viewModel.Status = "Error: " + ex.Message;
                     }
                     break;
 
@@ -105,9 +105,9 @@ namespace IsoMetrix_Assessment.Controllers
                             }
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        viewModel.Status = "Error";
+                        viewModel.Status = "Error: " + ex.Message;
                     }
                     break;
 
