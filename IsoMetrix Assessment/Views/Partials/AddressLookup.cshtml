@@ -1,37 +1,46 @@
-﻿@model IsoMetrix_Assessment.Models.FormData
+﻿@model IsoMetrix_Assessment.Models.AddressLookupViewModel
 
 <div class="row">
     <div class="col-md-12">
-        <h2>API Status: @ViewBag.Status</h2>
+        <h2>Status: @Model.Status</h2>
     </div>
-</div> <div class="row">
-    <div class="col-md-12">
-        <h2>Format: @ViewBag.Format</h2>
-        <p>@ViewBag.RawOutput</p>
+</div> 
+
+@if (Model.LocationData != null && Model.LocationData.Any())
+{
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Format: @Model.Format</h2>
+            <p>@Model.RawOutput</p>
+        </div>
+    </div>    
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Grid View</h2>       
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Country</th>
+                    <th>Premise</th>
+                    <th>Route</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var location in Model.LocationData)
+                {
+                    <tr>
+                        <td>@location.Country</td>
+                        <td>@location.Premise</td>
+                        <td>@location.Route</td>
+                        <td>@location.Latitude</td>
+                        <td>@location.Longitude</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>    
-<div class="row">
-    <div class="col-md-12">
-        <h2>Grid View</h2>       
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th>Country</th>
-                <th>Premise</th>
-                <th>Route</th>
-                <th>Latitude</th>
-                <th>Longitude</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>@ViewBag.Country</td>
-                <td>@ViewBag.Premise</td>
-                <td>@ViewBag.Route</td>
-                <td>@ViewBag.Latitude</td>
-                <td>@ViewBag.Longitude</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+}
+

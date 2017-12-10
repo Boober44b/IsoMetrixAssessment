@@ -11,10 +11,14 @@
         @Html.AntiForgeryToken()
 
         <p>
-            @Html.DropDownListFor(m => m.FormatOption, new SelectList(""), "Please select", new { @class = "form-control",  required = "required"})
+            @Html.LabelFor(m=>m.FormatOption)
+            @Html.DropDownListFor(m => m.FormatOption, new SelectList(""), "Please select", new {@class = "form-control", required = "required"})
+            @Html.ValidationMessageFor(model => model.FormatOption)
         </p>
         <p>
-            @Html.TextBoxFor(m => m.Address, new { @class = "form-control", required = "required", placeholder="Address" })
+            @Html.LabelFor(m => m.Address)
+            @Html.TextBoxFor(m => m.Address, new {@class = "form-control", required = "required", placeholder = "Address"})
+            @Html.ValidationMessageFor(model => model.Address)
         </p>
         <p>
             <input type="submit" class="btn btn-primary btn-lg" value="Submit"/>

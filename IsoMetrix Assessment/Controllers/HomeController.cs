@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -27,6 +28,14 @@ namespace IsoMetrix_Assessment.Controllers
         [HttpPost]
         public ActionResult AddressLookup(FormData formData)
         {
+            var viewModel = new AddressLookupViewModel();
+
+            if (!ModelState.IsValid)
+            {
+                viewModel.Status = "Input Error: " + ModelState.Values.FirstOrDefault(e => e.Errors.Any())?.Errors.FirstOrDefault(x => !string.IsNullOrEmpty(x.ErrorMessage))?.ErrorMessage;
+                return PartialView("~/Views/Partials/AddressLookup.cshtml", viewModel);
+            }
+            
             var address = formData.Address;
             Format formatOption;
             Enum.TryParse(formData.FormatOption, out formatOption);
@@ -44,22 +53,27 @@ namespace IsoMetrix_Assessment.Controllers
 
                         var parsedXml = (GeocodeResponse)serializer.Deserialize(memStream);
 
-                        ViewBag.Format = "XML";
-                        ViewBag.RawOutput = rawXml;
-                        ViewBag.Status = parsedXml.Status;
+                        viewModel.Format = "XML";
+                        viewModel.RawOutput = rawXml;
+                        viewModel.Status = parsedXml.Status;
 
                         if (parsedXml.Status == "OK")
                         {
-                            ViewBag.Route = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("route"))?.Long_name;
-                            ViewBag.Country = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("country"))?.Long_name;
-                            ViewBag.Premise = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("premise"))?.Long_name;
-                            ViewBag.Longitude = parsedXml.Result.Geometry.Location.Lng;
-                            ViewBag.Latitude = parsedXml.Result.Geometry.Location.Lat;
+                            viewModel.LocationData = new List<LocationData>();
+                            var locationData = new LocationData
+                            {
+                                Route = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("route"))?.Long_name,
+                                Country = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("country"))?.Long_name,
+                                Premise = parsedXml.Result.Address_component.FirstOrDefault(x => x.Type.Contains("premise"))?.Long_name,
+                                Longitude = parsedXml.Result.Geometry.Location.Lng,
+                                Latitude = parsedXml.Result.Geometry.Location.Lat
+                            };
+                            viewModel.LocationData.Add(locationData);
                         }
                     }
                     catch (Exception)
                     {
-                        ViewBag.Status = "Error";
+                        viewModel.Status = "Error";
                     }
                     break;
 
@@ -70,32 +84,40 @@ namespace IsoMetrix_Assessment.Controllers
                         var rawJson = CallGoogle("json", address);
                         var parsedJson = JsonConvert.DeserializeObject<GeolocationJson>(rawJson);
 
-                        ViewBag.Format = "JSON";
-                        ViewBag.RawOutput = rawJson;
-                        ViewBag.Status = parsedJson.status;
+                        viewModel.Format = "JSON";
+                        viewModel.RawOutput = rawJson;
+                        viewModel.Status = parsedJson.status;
 
                         if (parsedJson.status == "OK")
                         {
-                            ViewBag.Route = parsedJson.results.FirstOrDefault()?.address_components.FirstOrDefault(x => x.types.Contains("route"))?.long_name;
-                            ViewBag.Country = parsedJson.results.FirstOrDefault()?.address_components.FirstOrDefault(x => x.types.Contains("country"))?.long_name;
-                            ViewBag.Premise = parsedJson.results.FirstOrDefault()?.address_components.FirstOrDefault(x => x.types.Contains("premise"))?.long_name;
-                            ViewBag.Longitude = parsedJson.results.FirstOrDefault()?.geometry.location.lng.ToString(CultureInfo.InvariantCulture);
-                            ViewBag.Latitude = parsedJson.results.FirstOrDefault()?.geometry.location.lat.ToString(CultureInfo.InvariantCulture);
+                            foreach (var result in parsedJson.results)
+                            {
+                                viewModel.LocationData = new List<LocationData>();
+                                var locationData = new LocationData
+                                {
+                                    Route = result.address_components.FirstOrDefault(x => x.types.Contains("route"))?.long_name,
+                                    Country = result.address_components.FirstOrDefault(x => x.types.Contains("country"))?.long_name,
+                                    Premise = result.address_components.FirstOrDefault(x => x.types.Contains("premise"))?.long_name,
+                                    Longitude = result.geometry.location.lng.ToString(CultureInfo.InvariantCulture),
+                                    Latitude = result.geometry.location.lat.ToString(CultureInfo.InvariantCulture)
+                                };
+                                viewModel.LocationData.Add(locationData);
+                            }
                         }
                     }
                     catch (Exception)
                     {
-                        ViewBag.Status = "Error";
+                        viewModel.Status = "Error";
                     }
                     break;
 
                 default:
-                    ViewBag.Status = "Input Error";
+                    viewModel.Status = "Input Error";
                     break;
-                    
+
             }
 
-            return PartialView("~/Views/Partials/AddressLookup.cshtml");
+            return PartialView("~/Views/Partials/AddressLookup.cshtml", viewModel);
         }
 
         private static string CallGoogle(string format, string address)
@@ -107,6 +129,4 @@ namespace IsoMetrix_Assessment.Controllers
             return responseStream != null ? new StreamReader(responseStream).ReadToEnd() : string.Empty;
         }
     }
-
-    
 }
